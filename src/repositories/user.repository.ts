@@ -1,12 +1,10 @@
 import User from '../entities/user.entity'
+import { CreateUserDTO, UpdateUserDTO } from '../dtos/user.dto'
 
-interface CreateUserDTO{
-    name: string
-    email: string
-    password: string
-}
 export const createUser = async (data: CreateUserDTO)=> {
-    return User.create({data})
+    const newUser = await User.create({ data })
+
+    return {...newUser, password: undefined}
 }
 
 export const findAllUsers = async () => {
@@ -17,7 +15,7 @@ export const findUserByEmail = async(email: string) =>{
     return User.findFirst({where: {email}})
 }
 
-export const updateUser = async (id: number, data:CreateUserDTO) =>{
+export const updateUser = async (id: number, data:UpdateUserDTO) =>{
     return User.update({where:{id},data})
 }
 export const deleteUser = async (id: number) =>{
@@ -26,4 +24,8 @@ export const deleteUser = async (id: number) =>{
 
 export const findUserById = async (id: number) => {
     return User.findFirst({ where: { id } }) 
+  }
+
+  export const findUserByIdWithTasks = async (id: number) => {
+    return User.findFirst({ where: { id }, include: { tasks: true } }) // O include: { tasks: true } faz com que as tarefas sejam incluídas na busca
   }

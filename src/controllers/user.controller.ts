@@ -1,5 +1,7 @@
 import { Request, Response } from "express"
-import { createUserService, findAllUsersService, updateUserService, deleteUserService } from "../services/user.service"
+import { createUserService, findAllUsersService, updateUserService, deleteUserService, findUserByIdWithTasksService } from "../services/user.service"
+import { authenticateUserService } from '../services/user.service'
+
 
 export const createUser = async (req: Request, res: Response) => {
     try {
@@ -32,3 +34,28 @@ export const findAllUsers = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'User não localizado' }) 
     }
   }
+
+
+  export const findUserByIdWithTasks = async (req: Request, res: Response) => {
+    const id = Number(req.params.id)
+    
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'ID inválido' })
+    }
+  
+    const user = await findUserByIdWithTasksService(id)
+    return res.status(200).json(user)
+  }
+  
+export const authenticateUser = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body
+    if (!email || !password) {
+      return res.status(400).json({ message: 'E-mail e senha são obrigatórios' })
+    }
+    const token = await authenticateUserService(email, password)
+    return res.status(200).json({ token })
+  } catch (error) {
+    return res.status(400).json({ message: error })
+  }
+}
